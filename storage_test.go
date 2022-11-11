@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -11,10 +12,10 @@ func TestStorage_FindUser(t *testing.T) {
 		users        []User // The given underlying user storage.
 		id           int    // The desired user ID.
 		expectedUser User   // The expected User instance.
-		shouldFail   bool   // Indicates whether the function should return an error.
+		expectedErr  error  // The error that is expected to be returned.
 	}{
 		// In case the user exists, FindUser is expected to return the User instance with
-		// the given ID (in this case, user #2). The call should not fail.
+		// the given ID (in this case, user #2). The call should return no error.
 		"user exists": {
 			users: []User{
 				{ID: 1, Name: "User #1"},
@@ -23,7 +24,7 @@ func TestStorage_FindUser(t *testing.T) {
 			},
 			id:           2,
 			expectedUser: User{ID: 2, Name: "User #2"},
-			shouldFail:   false,
+			expectedErr:  nil,
 		},
 		// In case the user doesn't exist, FindUser is expected to return an error.
 		"user doesn't exist": {
@@ -32,7 +33,7 @@ func TestStorage_FindUser(t *testing.T) {
 			},
 			id:           2,
 			expectedUser: User{},
-			shouldFail:   true,
+			expectedErr:  ErrUserNotFound,
 		},
 	}
 
@@ -44,12 +45,10 @@ func TestStorage_FindUser(t *testing.T) {
 			// Perform the call using the given arguments and store the results.
 			user, err := storage.FindUser(test.id)
 
-			// Check whether the expression (err != nil) matches the expectation from the
-			// test case. That way, the test fails if the test case expects an error and
-			// no error is returned, or if the test case doesn't expect an error and an
-			// error is returned.
-			if test.shouldFail != (err != nil) {
-				t.Fatalf("error expectancy doesn't match: shouldFail is %v, but error != nil is %v", test.shouldFail, err != nil)
+			// Use errors.Is to determine if the expected error was returned.
+			// This also works with nil errors.
+			if !errors.Is(err, test.expectedErr) {
+				t.Fatalf("error expectancy doesn't match: expectedErr is %v, but got %v", test.expectedErr, err)
 			}
 
 			// Compare the expected and the actually retrieved user instances and store
