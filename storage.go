@@ -10,12 +10,12 @@ type User struct {
 }
 
 type Storage struct {
-	users []User
+	users map[string]User
 }
 
 // NewStorage initializes and returns a new Storage instance that utilizes the provided
 // user slice for storing its users.
-func NewStorage(users []User) Storage {
+func NewStorage(users map[string]User) Storage {
 	return Storage{
 		users: users,
 	}

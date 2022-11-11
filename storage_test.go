@@ -9,18 +9,18 @@ import (
 
 func TestStorage_FindUser(t *testing.T) {
 	tests := map[string]struct {
-		users        []User // The given underlying user storage.
-		id           int    // The desired user ID.
-		expectedUser User   // The expected User instance.
-		expectedErr  error  // The error that is expected to be returned.
+		users        map[string]User // The given underlying user storage.
+		id           int             // The desired user ID.
+		expectedUser User            // The expected User instance.
+		expectedErr  error           // The error that is expected to be returned.
 	}{
 		// In case the user exists, FindUser is expected to return the User instance with
 		// the given ID (in this case, user #2). The call should return no error.
 		"user exists": {
-			users: []User{
-				{ID: 1, Name: "User #1"},
-				{ID: 2, Name: "User #2"},
-				{ID: 3, Name: "User #3"},
+			users: map[string]User{
+				"User #1": {ID: 1, Name: "User #1"},
+				"User #2": {ID: 2, Name: "User #2"},
+				"User #3": {ID: 3, Name: "User #3"},
 			},
 			id:           2,
 			expectedUser: User{ID: 2, Name: "User #2"},
@@ -28,8 +28,8 @@ func TestStorage_FindUser(t *testing.T) {
 		},
 		// In case the user doesn't exist, FindUser is expected to return an error.
 		"user doesn't exist": {
-			users: []User{
-				{ID: 1, Name: "User #1"},
+			users: map[string]User{
+				"User #1": {ID: 1, Name: "User #1"},
 			},
 			id:           2,
 			expectedUser: User{},
